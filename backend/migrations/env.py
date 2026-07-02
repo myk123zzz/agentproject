@@ -11,6 +11,7 @@ from policymind.infrastructure.postgres.base import Base
 
 # Import all models so Base.metadata is populated
 import policymind.auth.models  # noqa: F401
+import policymind.documents.orm  # noqa: F401
 
 config = context.config
 settings = Settings()  # type: ignore[call-arg]
