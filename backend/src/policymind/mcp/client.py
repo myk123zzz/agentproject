@@ -71,8 +71,18 @@ class EnterpriseMCPClient:
         self,
         name: str,
         arguments: dict[str, Any],
+        approval_token: str | None = None,
     ) -> ToolObservation:
-        """Invoke a tool by name with the given arguments."""
+        """Invoke a tool by name. Write tools require a valid approval token.
+
+        Raises ApprovalRequired if a write tool is called without approval.
+        """
+        from policymind.core.errors import ApprovalRequired
+
+        if name == "create_review_ticket" and not approval_token:
+            raise ApprovalRequired("create_review_ticket requires HITL approval")
+        # In production: validate approval token (thread_id, tool, args hash, expiry)
+
         from policymind.mcp.tools import (
             create_review_ticket,
             get_approval_chain,

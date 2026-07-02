@@ -12,18 +12,18 @@ from policymind.graph.ontology import is_valid_entity, is_valid_relation
 class ExtractedEntity(BaseModel):
     name: str
     type: str
-    tenant_id: int = 1
+    tenant_id: int
     confidence: float = 0.5
-    source_document_version_id: int | None = None
+    source_document_version_id: int
 
 
 class ExtractedRelation(BaseModel):
     source: str
     target: str
     type: str
-    tenant_id: int = 1
+    tenant_id: int
     confidence: float = 0.5
-    source_document_version_id: int | None = None
+    source_document_version_id: int
 
 
 class GraphExtraction(BaseModel):

@@ -1,10 +1,5 @@
-import axios from "axios";
-
-export const apiClient = axios.create({
-  baseURL: "/api/v1",
-  timeout: 30000,
-  headers: { "Content-Type": "application/json" },
-});
+import DOMPurify from "dompurify";
+import { marked } from "marked";
 
 export async function streamChat(
   query: string,
@@ -12,18 +7,29 @@ export async function streamChat(
   signal: AbortSignal,
   onEvent: (event: { event: string; data: unknown }) => void,
 ): Promise<void> {
+  const token = localStorage.getItem("access_token");
   const response = await fetch("/api/v1/chat/stream", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
     body: JSON.stringify({ query, thread_id: threadId }),
     signal,
   });
+
+  if (!response.ok) {
+    const err = await response.text();
+    onEvent({ event: "error", data: { message: err } });
+    return;
+  }
 
   if (!response.body) return;
 
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
+  let currentEvent = "";
 
   while (true) {
     const { done, value } = await reader.read();
@@ -35,17 +41,21 @@ export async function streamChat(
 
     for (const line of lines) {
       if (line.startsWith("event: ")) {
-        const eventType = line.slice(7).trim();
-        onEvent({ event: eventType, data: {} });
+        currentEvent = line.slice(7).trim();
       } else if (line.startsWith("data: ")) {
-        const data = JSON.parse(line.slice(6));
-        onEvent({ event: "data", data });
+        try {
+          const data = JSON.parse(line.slice(6));
+          onEvent({ event: currentEvent || "data", data });
+        } catch {
+          onEvent({ event: currentEvent || "data", data: line.slice(6) });
+        }
+        currentEvent = "";
       }
     }
   }
 }
 
 export function renderSafeMarkdown(source: string): string {
-  // Placeholder — real implementation uses marked + DOMPurify
-  return source;
+  const html = marked.parse(source) as string;
+  return DOMPurify.sanitize(html);
 }
