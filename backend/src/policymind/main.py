@@ -47,6 +47,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         allow_headers=["*"],
     )
 
+    # CRITICAL: override get_settings so every Depends(get_settings) returns
+    # the SAME Settings instance used to create the app.  Without this, route
+    # handlers resolve a fresh Settings() from the environment, which has a
+    # different JWT_SECRET — breaking positive-path auth entirely.
+    app.dependency_overrides[get_settings] = lambda: settings
+
     _register_routes(app, settings)
 
     return app
