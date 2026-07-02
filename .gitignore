@@ -48,5 +48,8 @@ frontend/dist/
 # SQLite (local dev)
 *.db
 
+# Local file storage
+backend/storage/
+
 # Docker
 docker-data/
