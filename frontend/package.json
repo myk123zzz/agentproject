@@ -1,0 +1,31 @@
+{
+  "name": "policymind-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview",
+    "typecheck": "vue-tsc --noEmit",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "vue": "^3.5",
+    "vue-router": "^4.4",
+    "pinia": "^2.2",
+    "axios": "^1.7",
+    "marked": "^14",
+    "dompurify": "^3.1",
+    "cytoscape": "^3.30"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.1",
+    "typescript": "~5.6",
+    "vite": "^5.4",
+    "vue-tsc": "^2.1",
+    "vitest": "^2.1",
+    "@vue/test-utils": "^2.4",
+    "jsdom": "^25"
+  }
+}

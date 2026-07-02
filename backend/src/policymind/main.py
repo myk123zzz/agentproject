@@ -62,10 +62,20 @@ def _register_routes(app: FastAPI, settings: Settings) -> None:
             raise DependencyUnavailable("invalid production configuration")
         return {"status": "ok"}
 
-    # Auth routes — import later to avoid circular dependency
+    # API routers
+    from policymind.api.v1.chat import router as chat_router
+    from policymind.api.v1.evaluations import router as eval_router
+    from policymind.api.v1.graph import router as graph_router
+    from policymind.api.v1.reviews import router as review_router
     from policymind.auth.router import router as auth_router
+    from policymind.documents.router import router as doc_router
 
     app.include_router(auth_router)
+    app.include_router(doc_router)
+    app.include_router(chat_router)
+    app.include_router(review_router)
+    app.include_router(graph_router)
+    app.include_router(eval_router)
 
     # Global exception handler
     @app.exception_handler(PolicyMindError)

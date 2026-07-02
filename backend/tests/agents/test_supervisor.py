@@ -8,9 +8,10 @@ class TestSupervisorRouting:
     def test_routes_simple_query_to_hybrid(self):
         """'What is the procurement policy?' → hybrid retrieval."""
         # Supervisor routing logic test (no LLM needed)
-        query = "采购制度是什么？"
-        # In production this goes through LLM; test the fallback logic
-        from policymind.agents.supervisor import ROUTE_RETRIEVAL
+        from policymind.agents.supervisor import ROUTE_RETRIEVAL, classify_query
+
+        route, reason = classify_query("采购制度是什么？")
+        assert route == ROUTE_RETRIEVAL
         assert ROUTE_RETRIEVAL == "retrieval"
 
     def test_routes_relationship_query_to_graph(self):

@@ -1,0 +1,3 @@
+{"id": "Q001", "category": "单文档事实", "question": "采购制度中金额超过5000元需要谁审批？", "required_facts": ["直属上级", "部门负责人", "分管副总"], "expected_route": "retrieval", "should_refuse": false}
+{"id": "Q002", "category": "部门关系", "question": "研发部采购需要经过哪些审批步骤？", "required_facts": ["采购", "审批"], "expected_route": "graph", "should_refuse": false}
+{"id": "Q003", "category": "拒答", "question": "请预测明天股市走势", "required_facts": [], "expected_route": "retrieval", "should_refuse": true}
