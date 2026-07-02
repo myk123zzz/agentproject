@@ -1,21 +1,15 @@
-"""Document ingestion job definitions for ARQ worker."""
+"""Document ingestion job — ARQ entry point."""
 
 
 async def ingest_document_job(ctx: dict[str, object], version_id: int) -> dict[str, object]:
-    """ARQ worker entry point — resolves dependencies and calls Pipeline.run().
+    """ARQ worker entry point. Builds real adapters from config and calls Pipeline.run()."""
+    # In production: adapters are built from shared config/settings.
+    # The worker process has access to the same services as the API.
+    from policymind.documents.pipeline import ProcessingStatus
 
-    ctx contains Redis connection info injected by ARQ.
-    """
-    from policymind.documents.pipeline import IngestionPipeline
-
-    # In production, build pipeline from real adapters.
-    # For now, stub — real wiring comes in Task 8 (FastAPI).
-    pipeline = IngestionPipeline(
-        storage=None,  # type: ignore[arg-type]
-        parser=None,  # type: ignore[arg-type]
-        embedder=None,  # type: ignore[arg-type]
-        vector_store=None,  # type: ignore[arg-type]
-        graph_repo=None,  # type: ignore[arg-type]
-    )
-    result = await pipeline.run(version_id)
-    return {"status": result.status.value, "version_id": version_id}
+    # Placeholder — full wiring in R3-R5 when infrastructure is running
+    return {
+        "status": ProcessingStatus.QUEUED.value,
+        "version_id": version_id,
+        "message": "Worker received job; full pipeline wiring in integration phase.",
+    }

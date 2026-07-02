@@ -1,4 +1,4 @@
-"""RetrievalService — orchestrates the full hybrid retrieval pipeline."""
+"""RetrievalService — hybrid retrieval pipeline."""
 
 import time
 from datetime import UTC, datetime
@@ -7,15 +7,12 @@ from typing import Any
 from policymind.retrieval.citations import build_citations
 from policymind.retrieval.embeddings import EmbeddingProvider
 from policymind.retrieval.fusion import rrf_fuse_simple
-from policymind.retrieval.ports import (
-    RetrievalBundle,
-    RetrievalTrace,
-)
+from policymind.retrieval.ports import RetrievalBundle, RetrievalTrace
 from policymind.retrieval.rerank import Reranker
 
 
 class RetrievalService:
-    """Orchestrates Dense/BM25 → RRF → Rerank → Parent Expansion → Citations."""
+    """Dense/BM25 → RRF → Rerank → Parent Expansion → Citations."""
 
     def __init__(
         self,
@@ -37,58 +34,43 @@ class RetrievalService:
         at: datetime | None = None,
         top_k: int = 8,
     ) -> RetrievalBundle:
-        """Run the full hybrid retrieval pipeline."""
         t0 = time.monotonic()
         trace = RetrievalTrace()
         at = at or datetime.now(UTC)
 
-        # Embed query
         query_vector = await self._embedder.embed_query(query)
 
-        # Dense + BM25 via vector store
-        try:
-            candidates = await self._vector_store.hybrid_search(
-                query_text=query,
-                query_vector=query_vector,
-                tenant_id=tenant_id,
-                access_level=access_level,
-                at=at,
-                limit_per_channel=30,
-            )
-            trace.dense_hits = len(candidates.dense)
-            trace.bm25_hits = len(candidates.sparse)
-        except Exception as e:
-            trace.error = str(e)
-            return RetrievalBundle(
-                query=query,
-                hits=[],
-                citations=[],
-                context="",
-                trace=trace,
-            )
+        candidates = await self._vector_store.hybrid_search(
+            query_text=query,
+            query_vector=query_vector,
+            tenant_id=tenant_id,
+            access_level=access_level,
+            at=at,
+            limit_per_channel=30,
+        )
+        trace.dense_hits = len(candidates.dense)
+        trace.bm25_hits = len(candidates.sparse)
 
-        # RRF fusion
         fused = rrf_fuse_simple(candidates.dense, candidates.sparse, limit=30)
         trace.fused_count = len(fused)
 
-        # Rerank
         try:
             reranked = await self._reranker.rerank(query, fused, limit=top_k)
             trace.rerank_count = len(reranked)
             trace.rerank_used = True
         except Exception:
             reranked = fused[:top_k]
+            trace.error = "rerank_degraded"
             trace.rerank_used = False
 
         trace.final_count = len(reranked)
-
-        # Citations
         citations = build_citations(reranked)
 
-        # Build context string for the LLM
         context_parts: list[str] = []
         for cit in citations:
-            context_parts.append(f"[{cit.id}] {cit.document_name} p.{cit.page_number}: {cit.quote}")
+            context_parts.append(
+                f"[{cit.id}] {cit.document_name} p.{cit.page_number}: {cit.quote}"
+            )
         context = "\n\n".join(context_parts)
 
         trace.latency_ms = (time.monotonic() - t0) * 1000

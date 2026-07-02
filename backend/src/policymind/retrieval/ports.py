@@ -8,16 +8,17 @@ class SearchHit:
     chunk_id: str
     text: str
     score: float
-    channel: str  # "dense", "bm25", "graph"
+    channel: str
     rank: int
     page_number: int = 1
     document_name: str = ""
     document_version: str = ""
+    bbox: tuple[float, float, float, float] | None = None
 
 
 @dataclass
 class Citation:
-    id: str  # C1, C2, ...
+    id: str
     document_name: str
     document_version: str
     page_number: int
@@ -37,8 +38,6 @@ class CitationValidation:
 
 @dataclass
 class RetrievalTrace:
-    """Record of what each stage returned and how long it took."""
-
     dense_hits: int = 0
     bm25_hits: int = 0
     graph_hits: int = 0

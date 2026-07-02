@@ -115,8 +115,9 @@ class TestJWT:
             token_version=1,
             settings=settings,
         )
-        # Tamper with the token
-        tampered = token[:-1] + ("A" if token[-1] != "A" else "B")
+        # Tamper with the token signature (last chunk after final dot)
+        parts = token.rsplit(".", 1)
+        tampered = parts[0] + ".tampered_signature"
         with pytest.raises(JWTError):
             decode_token(tampered, settings)
 
