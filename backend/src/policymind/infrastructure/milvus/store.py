@@ -23,6 +23,7 @@ class MemoryVectorStore:
                 "page_number": getattr(chunk, "page_number", 1),
                 "document_name": getattr(chunk, "document_name", "test"),
                 "document_version": getattr(chunk, "document_version", "1.0"),
+                "document_version_id": getattr(chunk, "document_version_id", 1),
                 "effective_from": getattr(chunk, "effective_from", None),
                 "effective_to": getattr(chunk, "effective_to", None),
             })
@@ -86,6 +87,6 @@ class MemoryVectorStore:
         before = len(self._chunks)
         self._chunks = [
             c for c in self._chunks
-            if c["tenant_id"] != tenant_id
+            if not (c["tenant_id"] == tenant_id and c.get("document_version_id") == version_id)
         ]
         return before - len(self._chunks)
