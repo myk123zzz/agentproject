@@ -8,7 +8,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from policymind.core.config import Settings, get_settings, validate_production_settings
-from policymind.core.errors import DependencyUnavailable, PolicyMindError
+from policymind.core.errors import (
+    DependencyUnavailable,
+    PolicyMindError,
+)
 from policymind.core.logging import setup_logging
 
 
@@ -64,11 +67,11 @@ def _register_routes(app: FastAPI, settings: Settings) -> None:
 
     # API routers
     from policymind.api.v1.chat import router as chat_router
+    from policymind.api.v1.documents import router as doc_router
     from policymind.api.v1.evaluations import router as eval_router
     from policymind.api.v1.graph import router as graph_router
     from policymind.api.v1.reviews import router as review_router
     from policymind.auth.router import router as auth_router
-    from policymind.documents.router import router as doc_router
 
     app.include_router(auth_router)
     app.include_router(doc_router)

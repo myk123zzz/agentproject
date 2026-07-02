@@ -1,4 +1,4 @@
-"""Application configuration via environment variables."""
+"""Application configuration with POLICYMIND_ namespace prefix."""
 
 from functools import lru_cache
 
@@ -6,9 +6,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    """PolicyMind settings loaded from environment / .env."""
+    """PolicyMind settings. All env vars prefixed with POLICYMIND_."""
 
     model_config = SettingsConfigDict(
+        env_prefix="POLICYMIND_",
         env_file=".env",
         env_file_encoding="utf-8",
         extra="ignore",

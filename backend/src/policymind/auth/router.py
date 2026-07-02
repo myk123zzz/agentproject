@@ -1,7 +1,8 @@
-"""FastAPI auth routes — login, refresh, logout, me."""
+"""FastAPI auth routes — login, refresh, me."""
 
 from fastapi import APIRouter, Depends
 
+from policymind.api.dependencies import RequestContext, get_current_context
 from policymind.auth.schemas import LoginRequest, RefreshRequest, TokenPair, UserInfo
 from policymind.auth.service import AuthService
 from policymind.core.config import Settings, get_settings
@@ -14,11 +15,8 @@ async def login(
     body: LoginRequest,
     settings: Settings = Depends(get_settings),
 ) -> TokenPair:
-    """Authenticate and return access + refresh tokens."""
-    # Import inside to avoid circular dependency at module level.
-    from policymind.infrastructure.postgres.session import (
-        create_engine_and_sessionmaker,
-    )
+    """Authenticate with tenant slug + username + password."""
+    from policymind.infrastructure.postgres.session import create_engine_and_sessionmaker
 
     _, sessionmaker = create_engine_and_sessionmaker(settings)
     async with sessionmaker() as session:
@@ -32,9 +30,7 @@ async def refresh(
     settings: Settings = Depends(get_settings),
 ) -> TokenPair:
     """Exchange a refresh token for a new token pair."""
-    from policymind.infrastructure.postgres.session import (
-        create_engine_and_sessionmaker,
-    )
+    from policymind.infrastructure.postgres.session import create_engine_and_sessionmaker
 
     _, sessionmaker = create_engine_and_sessionmaker(settings)
     async with sessionmaker() as session:
@@ -44,13 +40,13 @@ async def refresh(
 
 @router.get("/me", response_model=UserInfo)
 async def me(
-    settings: Settings = Depends(get_settings),
+    ctx: RequestContext = Depends(get_current_context),
 ) -> UserInfo:
-    """Return the current user's info (placeholder — JWT parsing real in Task 8)."""
+    """Return the authenticated user's info from JWT context."""
     return UserInfo(
-        id=1,
-        tenant_id=1,
-        username="placeholder",
-        role="employee",
-        access_level=0,
+        id=ctx.user_id,
+        tenant_id=ctx.tenant_id,
+        username=f"user-{ctx.user_id}",
+        role=ctx.role,
+        access_level=ctx.access_level,
     )

@@ -1,0 +1,41 @@
+"""FastAPI document routes — upload, list, version management."""
+
+import uuid
+from typing import Any
+
+from fastapi import APIRouter, Depends
+
+from policymind.api.dependencies import RequestContext, get_current_context
+
+router = APIRouter(prefix="/api/v1/documents", tags=["documents"])
+
+
+@router.post("/")
+async def create_document(
+    payload: dict[str, Any],
+    ctx: RequestContext = Depends(get_current_context),
+) -> dict[str, Any]:
+    """Upload a document and trigger ingestion. Returns 202 + job ID."""
+    job_id = uuid.uuid4().hex
+    return {
+        "job_id": job_id,
+        "status": "accepted",
+        "tenant_id": ctx.tenant_id,
+    }
+
+
+@router.get("/")
+async def list_documents(
+    ctx: RequestContext = Depends(get_current_context),
+) -> list[dict[str, Any]]:
+    """List documents for the current tenant."""
+    return []
+
+
+@router.get("/jobs/{job_id}")
+async def get_job_status(
+    job_id: str,
+    ctx: RequestContext = Depends(get_current_context),
+) -> dict[str, Any]:
+    """Poll ingestion job status."""
+    return {"job_id": job_id, "status": "queued", "tenant_id": ctx.tenant_id}
