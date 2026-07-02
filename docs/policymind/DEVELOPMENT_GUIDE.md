@@ -12,9 +12,9 @@
 
 | 文档 | 作用 |
 |---|---|
-| `2026-07-01-policymind-design.md` | 产品范围、完整架构、数据模型、验收指标 |
-| `docs/superpowers/plans/2026-07-01-policymind-implementation.md` | TDD任务顺序、阶段提交与验收 |
-| `docs/DEVELOPMENT_GUIDE.md` | 模块接口、关键函数、调用链、编码规范 |
+| `docs/policymind/2026-07-01-policymind-design.md` | 产品范围、完整架构、数据模型、验收指标 |
+| `docs/policymind/2026-07-01-policymind-implementation.md` | TDD任务顺序、阶段提交与验收 |
+| `docs/policymind/DEVELOPMENT_GUIDE.md` | 模块接口、关键函数、调用链、编码规范 |
 
 ## 2. 核心目标
 

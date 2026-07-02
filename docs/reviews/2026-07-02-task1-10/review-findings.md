@@ -102,6 +102,6 @@
 | Ambient `DEBUG=release` causes 10 test startup failures | Reproduced consistently and isolated with `DEBUG=false`; root cause is unprefixed settings namespace |
 
 ## Resources
-- `docs/superpowers/plans/2026-07-01-policymind-implementation.md`
-- `docs/DEVELOPMENT_GUIDE.md`
-- `2026-07-01-policymind-design.md`
+- `docs/policymind/2026-07-01-policymind-implementation.md`
+- `docs/policymind/DEVELOPMENT_GUIDE.md`
+- `docs/policymind/2026-07-01-policymind-design.md`
