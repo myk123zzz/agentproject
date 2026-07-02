@@ -45,5 +45,8 @@ coverage.xml
 node_modules/
 frontend/dist/
 
+# SQLite (local dev)
+*.db
+
 # Docker
 docker-data/
